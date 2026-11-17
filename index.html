@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Honzíkův Dinopark</title>
+<meta name="description" content="Postav si vlastní dinopark na ostrově: líhni 16 druhů dinosaurů, stav výběhy a kupuj nové pozemky.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Lilita+One&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Honzíkův Dinopark">
+<meta property="og:description" content="Postav si vlastní dinopark na ostrově: líhni 16 druhů dinosaurů, stav výběhy a kupuj nové pozemky.">
+<meta name="theme-color" content="#173323">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="game" aria-label="Herní plocha Honzíkova Dinoparku"></canvas>
+<div class="hud">
+  <div class="logo">Honzíkův Dinopark<small>Postav park, vylíhni dinosaury, kupuj nové pozemky</small></div>
+  <div class="stats">
+    <div class="pill"><span class="coin" aria-hidden="true"></span><div><span class="lbl">mince</span><span id="sCoins">0</span></div></div>
+    <div class="pill"><div><span class="lbl">návštěvníci</span><span id="sVis">0</span></div></div>
+    <div class="pill"><div><span class="lbl">dinosauři</span><span id="sDino">0</span></div></div>
+    <div class="pill"><div><span class="lbl">druhy</span><span id="sSpec">0</span></div></div>
+    <div class="pill"><div><span class="lbl">hodnocení</span><span id="sStars" class="stars"></span></div></div>
+  </div>
+  <section class="quests" aria-label="Úkoly"><h2>Úkoly <small id="qCount"></small></h2><ol id="questList"></ol></section>
+  <div class="hint" id="hint"></div>
+  <div class="pickbar" id="pickbar" hidden><span id="pickTxt"></span><button class="btn ghost" id="pickCancel">Zrušit</button></div>
+  <nav class="toolbar" id="toolbar" aria-label="Nástroje"></nav>
+  <button class="iconbtn" id="mute" aria-label="Vypnout zvuk"></button>
+  <button class="iconbtn" id="menuBtn" aria-label="Uložit a nastavení hry" style="left:72px"><svg viewBox="0 0 24 24"><path d="M4 4 H17 L20 7 V20 H4Z" fill="#5f9b3a" stroke="#3b2410" stroke-width="1.8" stroke-linejoin="round"/><rect x="7" y="4" width="9" height="6" fill="#fff5df" stroke="#3b2410" stroke-width="1.5"/><rect x="7" y="13" width="10" height="7" rx="1" fill="#fff5df" stroke="#3b2410" stroke-width="1.5"/></svg></button>
+  <div class="saved" id="savedTag"></div>
+  <div class="mini" aria-label="Mapa ostrova"><canvas id="miniCv" width="420" height="224"></canvas>
+    <div class="row"><button class="mbtn" id="zIn" aria-label="Přiblížit">+</button><button class="mbtn" id="zOut" aria-label="Oddálit">−</button><button class="mbtn wide" id="zPark">Můj park</button><button class="mbtn wide" id="zAll">Celý ostrov</button></div></div>
+  <div class="toast" id="toast" role="status"></div>
+  <div class="info" id="info"><canvas id="infoCv"></canvas><h3 id="infoName"></h3><div class="era" id="infoEra"></div><p id="infoFact"></p><p id="infoTxt"></p><button class="btn" id="infoMove" style="width:100%;margin-top:8px;font-size:15px">Přestěhovat do jiného výběhu</button></div>
+</div>
+<div class="modal-back" id="hatchModal">
+  <div class="modal" role="dialog" aria-labelledby="hTitle">
+    <div class="mhead"><div><h2 id="hTitle">Líheň</h2><p class="sub" id="hSub"></p></div><button class="btn ghost" id="hClose">Zavřít</button></div>
+    <div class="eggs" id="eggGrid"></div>
+  </div>
+</div>
+<div class="modal-back" id="menuModal">
+  <div class="modal" role="dialog" aria-labelledby="mTitle" style="width:min(520px,94vw)">
+    <div class="mhead"><div><h2 id="mTitle">Uložení hry</h2><p class="sub" id="mSub">Hra se ukládá sama každých 10 sekund do tohohle prohlížeče.</p></div><button class="btn ghost" id="mClose">Zavřít</button></div>
+    <div class="menu" id="menuMain">
+      <button class="btn" id="mSave">Uložit teď</button>
+      <div class="row2"><button class="btn ghost" id="mExport">Stáhnout zálohu</button><button class="btn ghost" id="mImport">Nahrát zálohu</button></div>
+      <p class="note">Záloha je soubor, který si můžeš přenést na jiný počítač nebo schovat. Nahráním zálohy se hra vrátí přesně tam, kde byla.</p>
+      <button class="btn danger" id="mNew">Začít novou hru</button>
+      <input type="file" id="mFile" accept=".json,application/json" hidden>
+    </div>
+    <div class="menu" id="menuConfirm" hidden>
+      <p class="note" style="font-size:16px;font-weight:700;color:#3b2410">Opravdu začít znovu? Celý park, dinosauři i mince se smažou.</p>
+      <div class="row2"><button class="btn danger" id="mYes">Ano, nová hra</button><button class="btn ghost" id="mNo">Ne, hrát dál</button></div>
+    </div>
+  </div>
+</div>
+<div class="modal-back" id="winModal">
+  <div class="modal win" role="dialog" aria-labelledby="wTitle" style="width:min(560px,94vw)">
+    <h2 id="wTitle">Dinopark je hotový!</h2>
+    <p class="sub">Splnil jsi všechny úkoly. Ostrov patří tobě a tvým dinosaurům.</p>
+    <div class="big"><div id="wDino">0<small>dinosaurů</small></div><div id="wSpec">0<small>druhů</small></div><div id="wVis">0<small>návštěvníků</small></div></div>
+    <button class="btn" id="wGo">Hrát dál</button>
+  </div>
+</div>
+<script src="js/dinosauri.js"></script>
+<script src="js/hra.js"></script>
+</body>
+</html>
