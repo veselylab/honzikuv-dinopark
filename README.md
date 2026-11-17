@@ -1,5 +1,7 @@
 # Honzíkův Dinopark
 
+**Hrát online:** https://veselylab.github.io/honzikuv-dinopark/
+
 Budovatelská hra v prohlížeči. Na ostrově postavíš vlastní dinopark, vylíhneš 16 druhů dinosaurů, přilákáš návštěvníky a dokupuješ nové pozemky, dokud nebude celý ostrov tvůj.
 
 Hru vymyslel a testoval Honza, naprogramovaná je s pomocí AI Claude. Běží v každém moderním prohlížeči (Chrome, Edge, Firefox, Safari) i na Chromebooku, nic se neinstaluje.
